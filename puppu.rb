@@ -10,16 +10,16 @@ class PuppuPlugin < Plugin
 
 
   def puppu(m,params)
-    sana = params[:hakusana]
-    valmiinaolevat = ['yleinen','tietotekniikka','politiikka','talous','yritysmaailma','oikeustiede','opiskelijaelämä','monikulttuurisuus']
-    kysely = "" if sana
-    if valmiinaolevat.include? sana
-      kysely='?a='+valmiinaolevat.index(sana).to_s
-    elsif sana
-      kysely="?avainsana=#{sana}"
+    word = params[:param]
+    list = ['yleinen','tietotekniikka','politiikka','talous','yritysmaailma','oikeustiede','opiskelijaelämä','monikulttuurisuus']
+    query = "" if word
+    if list.include? word
+      query='?a='+list.index(word).to_s
+    elsif word
+      query="?avainsana=#{word}"
     end
 
-    http_response = Net::HTTP.get_response URI.parse "http://puppulausegeneraattori.fi/#{kysely}"
+    http_response = Net::HTTP.get_response URI.parse "http://puppulausegeneraattori.fi/#{query}"
     http_response = http_response.body.slice!(http_response.body.index("<P CLASS=\"lause\""),http_response.body.length)
     message =  http_response.slice!(17, http_response.index("</P>")-17)
     ## if using 1.8.7 uncomment below
@@ -30,4 +30,4 @@ class PuppuPlugin < Plugin
 end
 
 plugin = PuppuPlugin.new
-plugin.map 'puppu :hakusana'#, :defaults => {:hakusana => 'tietotekniikka'}
+plugin.map 'puppu :param'#, :defaults => {:param => 'tietotekniikka'}
